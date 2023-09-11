@@ -2,10 +2,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const cookies = require("cookie-parser");
+const { celebrate, Joi } = require("celebrate");
 
 // Экспорт роута пользователя
-const users = require("./routes/users");
-const cards = require("./routes/cards");
+const { createUser, login } = require("./controllers/users");
+const auth = require("./middlewares/auth");
 
 // берем адрес порта из окружения
 const { PORT = 3000 } = process.env;
@@ -19,21 +21,47 @@ mongoose
   })
   .then(() => console.log("connected"));
 
-// запускаем приложение
 const app = express();
-
+app.use(cookies());
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: "64ef476c9a02f7cd629ffd52",
-  };
+app.post(
+  "/signup",
+  celebrate({
+    body: Joi.object().keys({
+      name: Joi.string().required().min(2).max(30),
+      about: Joi.string().required().min(2).max(30),
+      email: Joi.string().required().email(),
+      avatar: Joi.string()
+        .required()
+        .regex(
+          /^(https?:\/\/)?([a-z0-9-]+\.)*[a-z0-9-]+\.[a-z]{2,}\/?([^\s]*)$/
+        ),
+      password: Joi.string().required(),
+    }),
+  }),
+  createUser
+);
+app.post(
+  "/signin",
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required(),
+    }),
+  }),
+  login
+);
 
-  next();
+app.use(auth, require("./routes/users"));
+app.use(auth, require("./routes/cards"));
+
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message =
+    statusCode === 500 ? "На сервере произошла ошибка" : err.message;
+  res.status(statusCode).send({ message });
 });
-
-app.use(users);
-app.use(cards);
 
 app.listen(PORT, () => {
   console.log(`App is running out in ${PORT}`);
