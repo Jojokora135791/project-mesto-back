@@ -8,6 +8,7 @@ const { celebrate, Joi } = require("celebrate");
 // Экспорт роута пользователя
 const { createUser, login } = require("./controllers/users");
 const auth = require("./middlewares/auth");
+const { requestLogger,errorLogger } = require("./middlewares/logger");
 
 // берем адрес порта из окружения
 const { PORT = 3000 } = process.env;
@@ -22,8 +23,10 @@ mongoose
   .then(() => console.log("connected"));
 
 const app = express();
+app.use(requestLogger);
 app.use(cookies());
 app.use(bodyParser.json());
+app.use(requestLogger);
 
 app.post(
   "/signup",
