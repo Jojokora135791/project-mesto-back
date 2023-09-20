@@ -1,10 +1,10 @@
-const card = require("../models/card");
-const NotFoundError = require("../errors/NotFoundError");
-const BadRequestError = require("../errors/BadRequestError");
-const NoRightsError = require("../errors/NoRightsError");
+const Card = require('../models/card');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+const NoRightsError = require('../errors/NoRightsError');
 
 function getCards(req, res, next) {
-  return card
+  return Card
     .find({})
     .then((cards) => {
       res.send(cards);
@@ -15,14 +15,14 @@ function getCards(req, res, next) {
 function createCard(req, res, next) {
   const { name, link } = req.body;
   const userId = req.user._id;
-  card
+  Card
     .create({ name, link, owner: userId })
     .then((card) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        return next(new BadRequestError("Ошибка валидации"));
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError('Ошибка валидации'));
       }
       return next(err);
     });
@@ -30,58 +30,52 @@ function createCard(req, res, next) {
 
 function deleteCard(req, res, next) {
   const { cardId } = req.params;
-  card
+  Card
     .findById(cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError("Карточка не найдена");
+        throw new NotFoundError('Карточка не найдена');
       }
       if (!card.owner.equals(req.user._id)) {
-        throw new NoRightsError(
-          "Невозможно удалить карту с другим ID пользователя"
-        );
+        throw new NoRightsError('Невозможно удалить карту с другим ID пользователя');
       }
 
       card
         .deleteOne()
-        .then(() => {
-          return res.send({ message: "Карточка удалена" });
-        })
+        .then(() => res.send({ message: 'Карточка удалена' }))
         .catch(next);
     })
     .catch(next);
 }
 
-function likeCard(req, res) {
-
-  return card
+function likeCard(req, res, next) {
+  return Card
     .findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
-      { new: true }
+      { new: true },
     )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError("Карточка не найдена");
+        throw new NotFoundError('Карточка не найдена');
       }
-      res.send(card)
+      res.send(card);
     })
     .catch(next);
 }
 
-function dislikeCard(req, res) {
-
-  return card
+function dislikeCard(req, res, next) {
+  return Card
     .findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
-      { new: true }
+      { new: true },
     )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError("Карточка не найдена");
+        throw new NotFoundError('Карточка не найдена');
       }
-      res.send(card)
+      res.send(card);
     })
     .catch(next);
 }
