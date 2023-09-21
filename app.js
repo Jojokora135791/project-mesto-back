@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookies = require('cookie-parser');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors} = require('celebrate');
 
 // Экспорт роута пользователя
 const { createUser, login } = require('./controllers/users');
@@ -53,7 +53,7 @@ app.use(auth, require('./routes/users'));
 app.use(auth, require('./routes/cards'));
 
 // app.use(errorLogger);
-
+app.use(errors());
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = statusCode === 500 ? 'На сервере произошла ошибка' : err.message;
