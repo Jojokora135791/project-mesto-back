@@ -22,7 +22,7 @@ function createUser(req, res, next) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
+        return next(new BadRequestError('Ошибка валидации'));
       }
       if (err.code === 11000) {
         return next(

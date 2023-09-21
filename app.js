@@ -21,7 +21,7 @@ mongoose.connect('mongodb://localhost:27017/mydb', {
 });
 
 const app = express();
-app.use(requestLogger);
+// app.use(requestLogger);
 app.use(cookies());
 app.use(bodyParser.json());
 
@@ -52,7 +52,7 @@ app.post(
 app.use(auth, require('./routes/users'));
 app.use(auth, require('./routes/cards'));
 
-app.use(errorLogger);
+// app.use(errorLogger);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
