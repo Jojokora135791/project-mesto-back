@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const cookies = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 
+const NotFoundError = require('./errors/NotFoundError');
+
 // Экспорт роута пользователя
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -51,6 +53,10 @@ app.post(
 
 app.use(auth, require('./routes/users'));
 app.use(auth, require('./routes/cards'));
+
+app.use('*', () => {
+  throw new NotFoundError('Страница не найдена');
+});
 
 // app.use(errorLogger);
 app.use(errors());
