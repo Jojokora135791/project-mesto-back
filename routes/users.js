@@ -3,7 +3,6 @@ const { celebrate, Joi } = require('celebrate');
 
 const { getCurrentUser, getUsers, getUser, updateProfile, updateAvatar } = require('../controllers/users');
 
-
 router.get('/users', getUsers);
 router.get('/users/me', getCurrentUser);
 router.get('/users/:userId', celebrate({
