@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookies = require('cookie-parser');
-const { celebrate, Joi, errors} = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 
 // Экспорт роута пользователя
 const { createUser, login } = require('./controllers/users');
