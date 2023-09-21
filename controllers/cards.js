@@ -18,7 +18,7 @@ function createCard(req, res, next) {
   Card
     .create({ name, link, owner: userId })
     .then((card) => {
-      res.status(201).res.send({ data: card });
+      res.status(201).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -49,7 +49,7 @@ function deleteCard(req, res, next) {
 }
 
 function likeCard(req, res, next) {
-  return Card
+  Card
     .findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
@@ -59,7 +59,7 @@ function likeCard(req, res, next) {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
       }
-      res.send(card);
+      return res.send(card);
     })
     .catch(next);
 }

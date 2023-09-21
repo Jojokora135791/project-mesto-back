@@ -61,12 +61,15 @@ function getUsers(req, res, next) {
 
 function getUser(req, res, next) {
   const { userId } = req.params;
-  User
-    .findById(userId)
-    .then((user) => {
-      res.send({ data: user });
-    })
-    .catch((err) => next(new NotFoundError('Пользователь с таким ID не найден')));
+
+  User.findById(userId)
+  .then((user) => {
+    if (!user) {
+      throw new NotFoundError('Пользователь с таким ID не найден');
+    }
+    return res.send(user);
+  })
+  .catch(next);
 }
 
 function getCurrentUser(req, res, next) {
